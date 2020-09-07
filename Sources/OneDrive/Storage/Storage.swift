@@ -25,7 +25,7 @@ public class AsyncResult<R, E: Error> {
     ///
     ///  - Returns: The success value
     ///  - Throws: The error value
-    public func get() throws -> R {
+    public func await() throws -> R {
         // Await result
         self.condition.lock()
         while self.result == nil {

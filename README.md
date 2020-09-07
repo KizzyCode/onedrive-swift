@@ -13,12 +13,12 @@ let webview = { (url: String, code: String) in
 // Perform a login to get a token and create the OneDrive instance
 let token = AsyncResult<Token, OneDriveError>()
 _ = try Login(webview: webview, completion: token.set)
-let oneDrive = OneDrive(token: try token.get())
+let oneDrive = OneDrive(token: try token.await())
 
 // Create a file "/TestFile" with the contents "Testolope"
 let data = "Testolope".data(using: .utf8)!, result = AsyncResult<Void, OneDriveError>()
 oneDrive.create(file: "/TestFile", data: data, completion: result.set)
-try result.get()
+try result.await()
 ```
 
 Tip: See `Tests/OneDriveTests/OneDriveTests.swift` for more inspiration.

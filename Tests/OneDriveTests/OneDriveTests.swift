@@ -56,7 +56,7 @@ final class OneDriveTests: XCTestCase {
                 // Perform a login
                 let tokenResult = AsyncResult<Token, OneDriveError>()
                 _ = try Login(webview: webview(url:code:), completion: tokenResult.set)
-                return try tokenResult.get()
+                return try tokenResult.await()
             }
             
             // Load testing credentials
@@ -77,7 +77,7 @@ final class OneDriveTests: XCTestCase {
             // Refresh the token if appropriate
             let accessResult = AsyncResult<String, OneDriveError>()
             token.accessToken(completion: accessResult.set)
-            _ = try accessResult.get()
+            _ = try accessResult.await()
             
             // Store the new token
             try JSONEncoder().encode(token).write(to: tokenPath)
@@ -99,29 +99,29 @@ final class OneDriveTests: XCTestCase {
             // Create the entry
             let createResult = AsyncResult<Void, OneDriveError>()
             oneDrive.create(folder: "/de.KizzyCode.OneDrive.TestDir", completion: createResult.set)
-            try createResult.get()
+            try createResult.await()
             
             // Move folder
             let moveResult = AsyncResult<Void, OneDriveError>()
             oneDrive.move(path: "/de.KizzyCode.OneDrive.TestDir", newPath: "/de.KizzyCode.OneDrive.TestDir.moved",
                           completion: moveResult.set)
-            try moveResult.get()
+            try moveResult.await()
             
             // Validate the entry
             let readResult = AsyncResult<[DirectoryEntry], OneDriveError>()
             oneDrive.read(folder: "/", completion: readResult.set)
-            XCTAssert(try readResult.get().contains(where: { $0.name == "de.KizzyCode.OneDrive.TestDir.moved" }))
+            XCTAssert(try readResult.await().contains(where: { $0.name == "de.KizzyCode.OneDrive.TestDir.moved" }))
             
             // Delete folder
             let deleteResult = AsyncResult<Void, OneDriveError>()
             oneDrive.delete(path: "/de.KizzyCode.OneDrive.TestDir.moved", completion: deleteResult.set)
-            try deleteResult.get()
+            try deleteResult.await()
             
             // Validate that the entry has been deleted
             let isDeletedResult = AsyncResult<[DirectoryEntry], OneDriveError>()
             oneDrive.read(folder: "/", completion: isDeletedResult.set)
             XCTAssertFalse(
-                try isDeletedResult.get().contains(where: { $0.name == "de.KizzyCode.OneDrive.TestDir.moved" }))
+                try isDeletedResult.await().contains(where: { $0.name == "de.KizzyCode.OneDrive.TestDir.moved" }))
     	}
         
     	/// Tests file operations (operates on `/de.KizzyCode.OneDrive.Testfile.txt`)
@@ -133,29 +133,29 @@ final class OneDriveTests: XCTestCase {
             let createResult = AsyncResult<Void, OneDriveError>()
             oneDrive.create(file: "/de.KizzyCode.OneDrive.Testfile.txt", data: Self.testData,
                             completion: createResult.set)
-            try createResult.get()
+            try createResult.await()
             
             // Move file
             let moveResult = AsyncResult<Void, OneDriveError>()
             oneDrive.move(path: "/de.KizzyCode.OneDrive.Testfile.txt",
                           newPath: "/de.KizzyCode.OneDrive.Testfile.moved.txt", completion: moveResult.set)
-            try moveResult.get()
+            try moveResult.await()
             
             // Validate the entry
             let readResult = AsyncResult<Data, OneDriveError>()
             oneDrive.read(file: "/de.KizzyCode.OneDrive.Testfile.moved.txt", completion: readResult.set)
-            XCTAssertEqual(try readResult.get(), Self.testData)
+            XCTAssertEqual(try readResult.await(), Self.testData)
             
             // Delete file
             let deleteResult = AsyncResult<Void, OneDriveError>()
             oneDrive.delete(path: "/de.KizzyCode.OneDrive.Testfile.moved.txt", completion: deleteResult.set)
-            try deleteResult.get()
+            try deleteResult.await()
             
             // Validate that the entry has been deleted
             let isDeletedResult = AsyncResult<[DirectoryEntry], OneDriveError>()
             oneDrive.read(folder: "/", completion: isDeletedResult.set)
             XCTAssertFalse(
-                try isDeletedResult.get().contains(where: { $0.name == "de.KizzyCode.OneDrive.Testfile.moved.txt" }))
+                try isDeletedResult.await().contains(where: { $0.name == "de.KizzyCode.OneDrive.Testfile.moved.txt" }))
         }
     	
     	/// Ensures that the example code compiles
@@ -168,12 +168,12 @@ final class OneDriveTests: XCTestCase {
             // Perform a login to get a token and create the OneDrive instance
             let token = AsyncResult<Token, OneDriveError>()
             _ = try Login(webview: webview, completion: token.set)
-            let oneDrive = OneDrive(token: try token.get())
+            let oneDrive = OneDrive(token: try token.await())
             
             // Create a file "/TestFile" with the contents "Testolope"
             let data = "Testolope".data(using: .utf8)!, result = AsyncResult<Void, OneDriveError>()
             oneDrive.create(file: "/TestFile", data: data, completion: result.set)
-            try result.get()
+            try result.await()
     	}
     
         static var allTests = [
