@@ -12,7 +12,7 @@ let webview = { (url: String, code: String) in
 
 // Perform a login to get a token and create the OneDrive instance
 let token = AsyncResult<Token, OneDriveError>()
-_ = try OAuthLogin(webview: webview, completion: token.set)
+_ = try Login(webview: webview, completion: token.set)
 let oneDrive = OneDrive(token: try token.get())
 
 // Create a file "/TestFile" with the contents "Testolope"
