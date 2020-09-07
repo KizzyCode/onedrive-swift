@@ -1,0 +1,11 @@
+language: swift
+
+os:
+  - osx
+osx_image: xcode11
+
+install: swift package update
+
+script:
+  - swift build
+  - swift build -c release
